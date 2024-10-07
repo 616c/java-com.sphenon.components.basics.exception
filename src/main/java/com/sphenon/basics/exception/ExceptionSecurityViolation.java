@@ -21,30 +21,28 @@ import com.sphenon.basics.message.*;
 
     @doclet {@Category Definition} {@SecurityClass User} {@Maturity Final}
 
-    A safety check detected an invalid state, e.g. of an object or some
-    subsystem. The reason is unclear and may actually lie non-reconstructable
-    in the past. Though the cause of this type of error can be difficult to
-    locate, it is still most likely a programming error.
+    A security check failed, which may indicate unauthorised access,
+    missing credentials or insufficient privileges.
 */
-public class ExceptionInvalidState extends ExceptionAssertionProvedFalse
+public class ExceptionSecurityViolation extends ExceptionContractViolation
 {
-    protected ExceptionInvalidState (CallContext cc, Throwable cause, Message message) {
+    protected ExceptionSecurityViolation (CallContext cc, Throwable cause, Message message) {
         super(cc, cause, message);
     }
     
     static public void createAndThrow(CallContext cc, Message message) {
-        throw new ExceptionInvalidState(cc, null, message);
+        throw new ExceptionSecurityViolation(cc, null, message);
     }
 
     static public void createAndThrow(CallContext cc, Throwable cause, Message message) {
-        throw new ExceptionInvalidState(cc, cause, message);
+        throw new ExceptionSecurityViolation(cc, cause, message);
     }
 
-    static public ExceptionInvalidState createExceptionInvalidState(CallContext cc, Message message) {
-        return new ExceptionInvalidState(cc, null, message);
+    static public ExceptionSecurityViolation createExceptionSecurityViolation(CallContext cc, Message message) {
+        return new ExceptionSecurityViolation(cc, null, message);
     }
 
-    static public ExceptionInvalidState createExceptionInvalidState(CallContext cc, Throwable cause, Message message) {
-        return new ExceptionInvalidState(cc, cause, message);
+    static public ExceptionSecurityViolation createExceptionSecurityViolation(CallContext cc, Throwable cause, Message message) {
+        return new ExceptionSecurityViolation(cc, cause, message);
     }
 }

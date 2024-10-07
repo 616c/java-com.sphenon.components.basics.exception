@@ -15,11 +15,10 @@ package com.sphenon.basics.exception;
 *****************************************************************************/
 
 import com.sphenon.basics.context.*;
-import com.sphenon.basics.variatives.*;
-import com.sphenon.basics.variatives.classes.*;
+import com.sphenon.basics.context.classes.*;
+import com.sphenon.basics.exception.*;
+import com.sphenon.basics.variatives.tplinst.*;
 
-public class ExceptionStringPoolRetriever {
-    static public ExceptionStringPool retrieve (CallContext context) {
-        return ExceptionStringPool.getSingleton(context);
-    }
+public interface ExceptionMatch {
+    public Variative_String_  getText(CallContext context);
 }

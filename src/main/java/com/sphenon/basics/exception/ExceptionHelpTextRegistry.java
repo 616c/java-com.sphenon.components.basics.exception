@@ -1,7 +1,7 @@
 package com.sphenon.basics.exception;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -17,11 +17,14 @@ package com.sphenon.basics.exception;
 import com.sphenon.basics.context.*;
 import com.sphenon.basics.context.classes.*;
 import com.sphenon.basics.debug.*;
+import com.sphenon.basics.exception.*;
 import com.sphenon.basics.message.*;
 import com.sphenon.basics.variatives.tplinst.*;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 public class ExceptionHelpTextRegistry {
 
@@ -41,6 +44,8 @@ public class ExceptionHelpTextRegistry {
 
     static protected Map<Class,ExceptionTranslator> translator_registry;
 
+    static protected List<ExceptionMatcher> matcher_registry;
+
     static public void register(CallContext context, Class c, Variative_String_ vs) {
         if (registry == null) {
             registry = new HashMap<Class,Variative_String_>();
@@ -55,9 +60,25 @@ public class ExceptionHelpTextRegistry {
         translator_registry.put(c, et);
     }
 
+    static public void register(CallContext context, ExceptionMatcher em) {
+        if (matcher_registry == null) {
+            matcher_registry = new ArrayList<ExceptionMatcher>();
+        }
+        matcher_registry.add(em);
+    }
+
     static public Variative_String_ get(CallContext context, Throwable t) {
+        if (matcher_registry != null) {
+            for (ExceptionMatcher matcher : matcher_registry) {
+                ExceptionMatch match = matcher.matches(context, t);
+                if (match != null) {
+                    return match.getText(context);
+                }
+            }
+        }
+
         Variative_String_ help_text = null;
-        
+
         if (t instanceof ExceptionError) {
             help_text = ((ExceptionError) t).getHelpMessageText();
             if (help_text != null) { return help_text; }

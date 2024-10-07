@@ -1,7 +1,7 @@
 package com.sphenon.basics.exception;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -131,6 +131,7 @@ abstract public class ExceptionError extends java.lang.Error implements Dumpable
                 for (String rs : rss) {
                     stack_dump_node.dump(context, rs);
                 }
+                stack_dump_node.close(context);
             }
         }
         DumpNode stack_dump_node = dump_node.openDumpTechnicalDetails(context, "StackTrace");
@@ -138,6 +139,7 @@ abstract public class ExceptionError extends java.lang.Error implements Dumpable
             for (StackTraceElement SE : this.getStackTrace()) {
                 stack_dump_node.dump(context, SE.toString());
             }
+            stack_dump_node.close(context);
         }
         Throwable cause = this.getCause();
         if (cause != null) {

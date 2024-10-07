@@ -1,7 +1,7 @@
 package com.sphenon.basics.exception;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -21,7 +21,7 @@ import com.sphenon.basics.message.*;
 
     @doclet {@Category Definition} {@SecurityClass User} {@Maturity Final}
 
-    The software is not configured properly. Typical reaons include:
+    The software is not configured properly. Typical reasons include:
     missing parameters, parameters with invalid values (e.g. non existent
     files), no configuration at all.
 */

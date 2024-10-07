@@ -1,7 +1,7 @@
 package com.sphenon.basics.exception;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -26,7 +26,7 @@ import com.sphenon.basics.message.*;
     conflicts or otherwise database related reasons. On the one hand side, a
     reasonable application might not only want but actually should catch them,
     on the other hand side they might be thrown in each and every modification
-    related method, i.e. means in many methods.
+    related method, i.e. in many methods.
 
     Therefore it is extremely unhandy to declare those exceptions at all those methods -
     a classical match for the java RuntimeException. Furthermore, emphasising the special
@@ -38,17 +38,18 @@ import com.sphenon.basics.message.*;
     "the transaction boundary", a concept not existing in programming languages like java.
     This boundary is a closure (not modeled) around all possible entry points (method
     invocations) into an object aggregate currently participating with an ongoing transaction.
-    Much care must be taken to keep this closure really closed, or alternative, tools like
+    Much care must be taken to keep this closure really closed, or alternatively, tools like
     code generators might be used to guarantee it (thereby augmenting language behaviour).
 
     Unfortunately, as a consequence of the lack of lanugage support for such a concept, no
     warnings will be issued if TransactionFailures are not caught by the application, which
     will result in runtime failures.
 */
-public class TransactionFailure extends java.lang.RuntimeException
+public class TransactionFailure extends java.lang.RuntimeException implements ExceptionWithMultipleCauses, ExceptionWithHelpMessage
 {
     protected Context context;
     protected Message message;
+    protected MessageText help_message_text; // end user readable
     protected Throwable[] causes;
 
     protected TransactionFailure (CallContext call_context, Throwable cause, Message message) {
@@ -62,12 +63,26 @@ public class TransactionFailure extends java.lang.RuntimeException
         }
     }
 
-    public Context getContext (CallContext call_context) {
+    protected TransactionFailure (CallContext call_context, Throwable cause, Message message, MessageText help_message_text) {
+        this(call_context, cause, message);
+        this.help_message_text = help_message_text;
+    }
+
+    public Context getContext () {
         return this.context;
     }
 
     public Message getMessageObject (CallContext call_context) {
         return this.message;
+    }
+
+    public MessageText getHelpMessageText () {
+        return this.help_message_text;
+    }
+
+    public String getHelpMessage () {
+        MessageText mt = this.getHelpMessageText();
+        return mt == null ? null : mt.getText(this.getContext());
     }
 
     public Throwable[] getCauses (CallContext call_context) {
@@ -103,8 +118,12 @@ public class TransactionFailure extends java.lang.RuntimeException
     }
 
     public String getMessage () {
+        return this.getMessage(true);
+    }
+
+    public String getMessage (boolean detailed) {
         String result_message = (this.message == null ? "" : this.message.toString());
-        if (this.causes != null) {
+        if (detailed && this.causes != null) {
             result_message += "\n[causes: ";
             for (int i=0; i<this.causes.length; i++) {
                 result_message += (i == 0 ? "" : ",\n") + this.causes[i].toString();
@@ -115,7 +134,11 @@ public class TransactionFailure extends java.lang.RuntimeException
     }
 
     public String toString () {
-        return this.getClass().getName() + " : " + this.getMessage();
+        return this.toString(true);
+    }
+
+    public String toString (boolean detailed) {
+        return this.getClass().getName() + " : " + this.getMessage(detailed);
     }
 
     static public void createAndThrow(CallContext cc, Message message) {
